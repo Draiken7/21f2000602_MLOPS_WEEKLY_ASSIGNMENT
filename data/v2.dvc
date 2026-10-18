@@ -1,0 +1,14 @@
+md5: 225057954ec3c55c4381c3bc5d3ae858
+frozen: true
+deps:
+- path: data/v2
+  repo:
+    url: https://github.com/IITMBSMLOps/ga_resources.git
+    rev: week_1
+    rev_lock: d26b9c73cc1f494884add0b493714dcbb64c968a
+outs:
+- md5: db6e5ee0081246714056290a0b765142.dir
+  size: 1310
+  nfiles: 1
+  hash: md5
+  path: v2
