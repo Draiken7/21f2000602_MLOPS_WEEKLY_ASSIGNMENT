@@ -1,0 +1,23 @@
+{
+  "training_rows_from_offline_store": 45,
+  "test_accuracy": 1.0,
+  "offline_features_match_raw": true,
+  "online_request_ids": [
+    1001,
+    1002,
+    1003
+  ],
+  "online_predictions": [
+    "versicolor",
+    "setosa",
+    "setosa"
+  ],
+  "online_features_match_latest_raw": true,
+  "online_predictions_match_raw_predictions": true,
+  "online_latency_ms": 33.4,
+  "bigquery_offline_rows": 45,
+  "bigquery_features_match_file_store": true,
+  "bigquery_retrieval_seconds": 10.68,
+  "file_retrieval_seconds": 0.15,
+  "bigquery_trained_accuracy": 1.0
+}
