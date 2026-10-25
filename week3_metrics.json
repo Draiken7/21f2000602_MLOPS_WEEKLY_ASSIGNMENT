@@ -1,0 +1,5 @@
+{
+  "training_rows_from_offline_store": 45,
+  "test_accuracy": 1.0,
+  "offline_features_match_raw": true
+}

@@ -1,0 +1,5 @@
+outs:
+- md5: 727be1af199154fc3f634291e83a0514
+  size: 2009
+  hash: md5
+  path: iris_feast_model.joblib
