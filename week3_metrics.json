@@ -14,5 +14,10 @@
   ],
   "online_features_match_latest_raw": true,
   "online_predictions_match_raw_predictions": true,
-  "online_latency_ms": 22.5
+  "online_latency_ms": 22.5,
+  "bigquery_offline_rows": 45,
+  "bigquery_features_match_file_store": true,
+  "bigquery_retrieval_seconds": 8.68,
+  "file_retrieval_seconds": 0.14,
+  "bigquery_trained_accuracy": 1.0
 }
