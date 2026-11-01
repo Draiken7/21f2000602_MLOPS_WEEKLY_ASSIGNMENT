@@ -28,3 +28,16 @@ FEATURE_RANGES = {
     "petal_width": (0.0, 3.0),
 }
 MIN_ROWS = 30
+
+# --- Model evaluation (Stage 5) -------------------------------------------
+# Independent evaluation data: the Week 2 Iris file (real flowers the
+# Feast model never saw).
+IRIS_CSV = ROOT / "data/iris.csv"
+
+# Same split settings as the Week 3 notebook's train_test_split call.
+TEST_SIZE = 0.4
+RANDOM_STATE = 42
+
+# Quality gates: CI fails if any score drops below these.
+# Week 3 reported accuracy 1.0, so 0.9 allows small noise but not a real drop.
+MIN_SCORES = {"accuracy": 0.90, "precision": 0.90, "recall": 0.90, "f1": 0.90}
