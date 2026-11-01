@@ -8,7 +8,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write        # CML posts comments on commits
+  pull-requests: write   # CML posts comments on pull requests
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -16,23 +17,18 @@ concurrency:
 
 jobs:
   test:
-    name: DVC pull + pytest
-    runs-on: ubuntu-latest
+    name: DVC pull + pytest + CML report
+    runs-on: self-hosted   # our runner in GCP Cloud Shell
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python3 --version
+          python3 -m pip install --quiet -r requirements.txt
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -48,4 +44,34 @@ jobs:
           ls -la artifacts/
 
       - name: Run tests
-        run: pytest -v
+        id: tests
+        continue-on-error: true
+        run: |
+          mkdir -p reports
+          python3 -m pytest -v --junitxml=reports/junit.xml
+
+      - name: Evaluate model
+        if: always()
+        continue-on-error: true
+        run: python3 evaluate.py
+
+      - name: Build CML report
+        if: always()
+        run: python3 make_report.py
+
+      - name: Post CML report
+        if: always()
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npx --yes @dvcorg/cml comment create --target=pr/${{ github.event.pull_request.number }} report.md
+          else
+            npx --yes @dvcorg/cml comment create report.md
+          fi
+
+      - name: Fail the job if any test failed
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "::error::One or more tests failed - see the CML report."
+          exit 1
