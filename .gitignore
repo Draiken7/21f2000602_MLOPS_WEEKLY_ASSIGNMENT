@@ -1,0 +1,11 @@
+# Python / pytest caches - regenerated on every run
+__pycache__/
+.pytest_cache/
+
+# Jupyter autosave backups
+.ipynb_checkpoints/
+
+# CI outputs (added in later stages)
+reports/
+report.md
+confusion_matrix.png

@@ -1,0 +1,10 @@
+# Packages CI needs to pull versioned data/models and run the tests.
+# Versions are pinned to match the environment the model was trained and
+# tested in (Cloud Shell, Python 3.12), so CI behaves exactly the same.
+scikit-learn==1.9.1
+pandas==3.1.0
+numpy==2.4.6
+joblib==1.6.0
+pytest==9.2.0
+dvc==3.67.1
+dvc-gs==3.1.0
