@@ -8,7 +8,6 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # --- Artifacts produced by Week 3 and versioned with DVC ------------------
 FEAST_DATA = ROOT / "iris_feature_store/feature_repo/data/iris_data_adapted_for_feast.csv"
-MODEL_PATH = ROOT / "artifacts/iris_feast_model.joblib"
 
 # --- Schema: must match the Feast FeatureView in iris_features.py ---------
 ENTITY_KEY = "iris_id"                 # Entity join key
