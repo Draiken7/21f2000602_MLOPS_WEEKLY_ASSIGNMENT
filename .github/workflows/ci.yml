@@ -17,47 +17,57 @@ concurrency:
 
 jobs:
   test:
-    name: DVC pull + pytest + CML report
-    runs-on: self-hosted   # our runner in GCP Cloud Shell
+    name: DVC data + MLflow model + pytest + CML report
+    runs-on: self-hosted   # our runner in GCP Cloud Shell (next to the MLflow tunnel)
+    env:
+      MLFLOW_TRACKING_URI: http://127.0.0.1:5000   # MLflow server on the VM, via SSH tunnel
+      MLFLOW_DISABLE_AGENT_HINT: "1"
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install dependencies in a clean CI virtual environment
         run: |
-          python3 --version
-          python3 -m pip install --quiet -r requirements.txt
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          [ -x "$HOME/ci-venv/bin/python" ] || python3 -m venv "$HOME/ci-venv"
+          "$HOME/ci-venv/bin/pip" install --quiet --upgrade pip
+          "$HOME/ci-venv/bin/pip" install --quiet -r requirements.txt
+          echo "$HOME/ci-venv/bin" >> "$GITHUB_PATH"
+
+      - name: Show tool versions
+        run: python -c "import mlflow, sklearn, pandas; print('mlflow', mlflow.__version__, '| sklearn', sklearn.__version__, '| pandas', pandas.__version__)"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Pull data and model with DVC
-        run: dvc pull
-
-      - name: Show what DVC fetched
+      - name: Pull data with DVC (models are no longer in DVC)
         run: |
-          wc -l iris_feature_store/feature_repo/data/iris_data_adapted_for_feast.csv
-          ls -la artifacts/
+          dvc pull
+          git ls-files '*.dvc'
 
-      - name: Run tests
+      - name: Check the MLflow server is reachable
+        run: |
+          curl -sf -m 10 "$MLFLOW_TRACKING_URI/health" \
+            || { echo "::error::MLflow server not reachable at $MLFLOW_TRACKING_URI - run scripts/mlflow_tunnel.sh in Cloud Shell"; exit 1; }
+          python -c "from evaluate import resolve_model_version as r; print('Model under test:', r()[1])"
+
+      - name: Run tests (model fetched from the MLflow registry)
         id: tests
         continue-on-error: true
         run: |
           mkdir -p reports
-          python3 -m pytest -v --junitxml=reports/junit.xml
+          python -m pytest -v --junitxml=reports/junit.xml
 
-      - name: Evaluate model
+      - name: Evaluate the registry model
         if: always()
         continue-on-error: true
-        run: python3 evaluate.py
+        run: python evaluate.py
 
       - name: Build CML report
         if: always()
-        run: python3 make_report.py
+        run: python make_report.py
 
       - name: Post CML report
         if: always()

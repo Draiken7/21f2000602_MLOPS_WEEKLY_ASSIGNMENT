@@ -58,12 +58,16 @@ def main():
         f"**Status:** {status}  ",
         f"**Branch:** `{branch}` · **Commit:** `{sha}` · **Event:** `{os.getenv('GITHUB_EVENT_NAME', 'local')}`",
         "",
-        "### 📊 Model evaluation (Week 3 Feast model)",
+        "### 📊 Model evaluation",
         "",
     ]
 
     if METRICS.exists():
         results = json.loads(METRICS.read_text())
+        model_info = results.pop("model", None)
+        if model_info:
+            lines += [f"**Model:** `models:/{model_info['name']}/{model_info['version']}` "
+                      "(fetched from the MLflow Model Registry)", ""]
         names = list(results)
         lines.append("| Metric | Minimum | " + " | ".join(names) + " |")
         lines.append("|---" * (len(names) + 2) + "|")
@@ -74,8 +78,8 @@ def main():
                 cells.append(f"{value:.3f} {'✅' if value >= minimum else '❌'}")
             lines.append(f"| {metric} | {minimum} | " + " | ".join(cells) + " |")
         lines.append("| rows evaluated | | " + " | ".join(str(results[n]["n_samples"]) for n in names) + " |")
-        lines += ["", "_holdout = 40% split of the Feast training data · "
-                      "iris_csv = real Iris flowers the model never saw_"]
+        lines += ["", "_iris_test = 40% held-out split of data/iris.csv · "
+                      "feast = Feast training data the model never saw_"]
     else:
         lines.append("_No metrics - evaluate.py did not run (see the workflow log)._")
 
