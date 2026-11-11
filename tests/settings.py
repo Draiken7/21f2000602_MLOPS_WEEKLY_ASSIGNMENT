@@ -41,3 +41,9 @@ RANDOM_STATE = 42
 # Quality gates: CI fails if any score drops below these.
 # Week 3 reported accuracy 1.0, so 0.9 allows small noise but not a real drop.
 MIN_SCORES = {"accuracy": 0.90, "precision": 0.90, "recall": 0.90, "f1": 0.90}
+
+# --- MLflow (Week 5) ------------------------------------------------------
+# Models are tracked and stored in MLflow (server on the VM), not in DVC.
+MLFLOW_EXPERIMENT = "iris-dt-tuning"   # experiment that groups the tuning runs
+MODEL_NAME = "iris-classifier"         # name in the Model Registry
+MODEL_ALIAS = "champion"               # alias that points at the best version
